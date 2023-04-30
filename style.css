@@ -1,0 +1,56 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+    font-family: Helvetica;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    height: 50px;
+    width: 700px;
+    border: 1px solid black;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#lives-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.life {
+    height: 30px;
+    width: 30px;
+    margin: 2px;;
+    border: 1px solid black;
+    border-radius: 50%;
+    background-color: red;
+
+}
+
+#canvas {
+    border: 1px solid black;
+}
+
+footer {
+    height: 50px;
+    width: 700px;
+    border: 1px solid black;
+}
