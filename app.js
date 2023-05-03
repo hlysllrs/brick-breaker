@@ -25,14 +25,16 @@ canvasEl.height = canvasEl.width / 2
 /*-----------------------------------------
 variables
 ------------------------------------------*/
+// define ball layout
 const ball = {
     x: canvasEl.width / 2,
     y: canvasEl.height -31,
-    radius: 10,
+    radius: 7,
     vx: -1,
-    vy: -1
+    vy: -2
 }
 
+// define paddle layout
 const paddle = {
     x: canvasEl.width / 2 - (canvasEl.width / 10 / 2),
     y: canvasEl.height - 20,
@@ -42,6 +44,7 @@ const paddle = {
     vxr: 0
 }
 
+// define brick layout
 const brickLayout = {
     x: canvasEl.width * .05, 
     y: canvasEl.height * .05, 
@@ -54,40 +57,7 @@ const brickLayout = {
     colors:['#e92e3d', '#ff9300','#ffcf02', '#00993c', '#5eb99b', '#028fe1', '#0052bc', '#995cc7', '#e64388']
 }
 
-const brickStart = {
-    x: canvasEl.width * .05, 
-    y: canvasEl.height * .05, 
-    width: canvasEl.width * .0406,
-    height: canvasEl.height * .0411,
-
-}
-
 const bricksArr = []
-
-function addBricksToArr() {
-    for(i = 0; i < brickLayout.rows; i++) {
-        const brickRow = []
-        for(j = 0; j < brickLayout.columns; j++) {
-            const brick = {
-                x: brickLayout.x,
-                y: brickLayout.y,
-                width: brickLayout.width,
-                height: brickLayout.height,
-                color: brickLayout.colors[i]
-            }
-            brickRow.push(brick)
-            brickLayout.x += brickLayout.width + brickLayout.xOffset
-
-        }
-        bricksArr.push(brickRow)
-        brickLayout.y += brickLayout.height + brickLayout.yOffset
-        brickLayout.x = canvasEl.width * .05
-    }
-    console.log(bricksArr)
-}
-
-addBricksToArr()
-
 
 
 /*-----------------------------------------
@@ -133,7 +103,16 @@ document.addEventListener('keydown', (e) => {
 /*-----------------------------------------
 functions
 ------------------------------------------*/
-function init() {
+function start() {
+    setCanvasSize()
+    addBricksToArr()
+    drawBall()
+    drawPaddle()
+    drawBricks()
+}
+
+
+function resetScreen() {
     setCanvasSize()
     drawBall()
     drawPaddle()
@@ -143,6 +122,28 @@ function init() {
 function setCanvasSize() {
     canvasEl.width = canvasEl.clientWidth
     canvasEl.height = canvasEl.width / 2
+}
+
+// create brick layout
+function addBricksToArr() {
+    for(i = 0; i < brickLayout.rows; i++) {
+        const brickRow = []
+        for(j = 0; j < brickLayout.columns; j++) {
+            const brick = {
+                x: brickLayout.x,
+                y: brickLayout.y,
+                width: brickLayout.width,
+                height: brickLayout.height,
+                color: brickLayout.colors[i]
+            }
+            brickRow.push(brick)
+            brickLayout.x += brickLayout.width + brickLayout.xOffset
+
+        }
+        bricksArr.push(brickRow)
+        brickLayout.y += brickLayout.height + brickLayout.yOffset
+        brickLayout.x = canvasEl.width * .05
+    }
 }
 
 function drawPaddle() {
@@ -180,7 +181,7 @@ function animate() {
         ball.y = canvasEl.height -30,
         paddle.x = canvasEl.width / 2 - (canvasEl.width / 10 / 2),
         paddle.y = canvasEl.height - 20,
-        init()
+        resetScreen()
     } else {
         requestAnimationFrame(animate)
     }
@@ -239,32 +240,49 @@ function animateBricks() {
     bricksArr.forEach((row) => {
         row.forEach((brick, i) => {
             // detect top of bricks
-            if (ball.x + ball.radius > brick.x && 
-                ball.x - ball.radius < brick.x + brick.width && 
-                ball.y + ball.radius > brick.y &&
-                ball.y - ball.radius < brick.y + brick.height) {
+            if (ball.x + ball.radius >= brick.x && 
+                ball.x - ball.radius <= brick.x + brick.width &&
+                ball.y + ball.radius >= brick.y &&
+                ball.y - ball.radius <= brick.y + brick.height * .2) {
                     ball.vy *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(i, 1)
                     console.log('hit top')
-            }
-            
-            // detect bottom of bricks???????
-            if (ball.x + ball.radius < brick.x && 
-                ball.x - ball.radius > brick.x + brick.width && 
-                ball.y + ball.radius < brick.y &&
-                ball.y - ball.radius > brick.y + brick.height){
+            // detect bottom of bricks
+            } else if(ball.x + ball.radius >= brick.x && 
+                ball.x - ball.radius <= brick.x + brick.width &&
+                ball.y - ball.radius >= brick.y + brick.height * .8 &&
+                ball.y + ball.radius <= brick.y + brick.height) {
                     ball.vy *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(i, 1)
                     console.log('hit bottom')
+            }
+            // detect left side of bricks
+            if (ball.x + ball.radius >= brick.x && 
+                ball.x - ball.radius <= brick.x + brick.width * .2 &&
+                ball.y + ball.radius >= brick.y &&
+                ball.y - ball.radius <= brick.y + brick.height) {
+                    ball.vx *= -1
+                    ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
+                    row.splice(i, 1)
+                    console.log('hit left')
+            // detect right side of bricks
+            } else if (ball.x - ball.radius >= brick.x + brick.width * .8 && 
+                ball.x + ball.radius <= brick.x + brick.width &&
+                ball.y + ball.radius >= brick.y &&
+                ball.y - ball.radius <= brick.y + brick.height) {
+                    ball.vx *= -1
+                    ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
+                    row.splice(i, 1)
+                    console.log('hit right')
             }
         })
     })
 }
 
 
-init()
+start()
 
 
 
