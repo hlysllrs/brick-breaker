@@ -1,6 +1,5 @@
 /* 
 PUZZLES TO SOLVE:
-- center bricks
 - move ball
     - fine tune movement directions?
     - ball accelerated when spacebar is pushed again??
@@ -8,6 +7,10 @@ PUZZLES TO SOLVE:
     - collisions with side of paddle
     - collisions with bricks 
         - sides and bottom??
+- sound doesn't play for every brick hit --> need shorter sound clip??
+- lives
+- game over
+- 1 or 2 players
 */
 
 /*-----------------------------------------
@@ -25,13 +28,19 @@ canvasEl.height = canvasEl.width / 2
 /*-----------------------------------------
 variables
 ------------------------------------------*/
+let score = 0
+const lives = [1, 1, 1]
+
+let sound = 'on'
+
+
 // define ball layout
 const ball = {
     x: canvasEl.width / 2,
     y: canvasEl.height -31,
     radius: 7,
-    vx: -1,
-    vy: -2
+    vx: -2,
+    vy: -4
 }
 
 // define paddle layout
@@ -46,7 +55,7 @@ const paddle = {
 
 // define brick layout
 const brickLayout = {
-    x: canvasEl.width * .05, 
+    x: canvasEl.width * .055, 
     y: canvasEl.height * .05, 
     width: canvasEl.width * .04472,
     height: canvasEl.height * .04111,
@@ -59,6 +68,9 @@ const brickLayout = {
 
 const bricksArr = []
 
+
+const blipSound = new Audio('sounds/blip-131856.mp3')
+const gameOverSound = new Audio ('sounds/game-over-arcade-6435.mp3')
 
 /*-----------------------------------------
 cached DOM elements
@@ -142,7 +154,7 @@ function addBricksToArr() {
         }
         bricksArr.push(brickRow)
         brickLayout.y += brickLayout.height + brickLayout.yOffset
-        brickLayout.x = canvasEl.width * .05
+        brickLayout.x = canvasEl.width * .055
     }
 }
 
@@ -175,6 +187,8 @@ function animate() {
     animatePaddle()
     animateBricks()
 
+    scoreEl.innerHTML = `score: ${score}`
+
     // check if ball is within canvas area
     if(ball.y - ball.radius > canvasEl.height) {
         ball.x = canvasEl.width / 2,
@@ -206,16 +220,23 @@ function animateBall() {
 
     // detect top of paddle
     if (ball.x + ball.radius > paddle.x && 
-            ball.x - ball.radius < paddle.x + paddle.width && 
-            ball.y + ball.radius > paddle.y && 
-            ball.y - ball.radius < paddle.y + paddle.height) {
-                ball.vy *= -1
-    }
-
-    // detect sides of paddle
-    // if () {
-        
-    // }
+        ball.x - ball.radius < paddle.x + paddle.width && 
+        ball.y + ball.radius > paddle.y && 
+        ball.y - ball.radius < paddle.y + paddle.height) {
+            ball.vy *= -1
+    // detect left side of paddle
+    } else if (ball.x + ball.radius >= paddle.x && 
+        ball.x - ball.radius <= paddle.x + paddle.width * .01 &&
+        ball.y + ball.radius >= paddle.y && 
+        ball.y - ball.radius <= paddle.y + paddle.height) {
+            ball.vx *= -1
+    // detect right side of paddle
+    } else if (ball.x + ball.radius >= paddle.x && 
+        ball.x - ball.radius <= paddle.x + paddle.width * .99 &&
+        ball.y + ball.radius >= paddle.y &&
+        ball.y - ball.radius <= paddle.y + paddle.height) {
+            ball.vx *= -1
+    } 
 }
 
 function animatePaddle() {
@@ -228,7 +249,7 @@ function animatePaddle() {
     if(paddle.x <= 0){
         paddle.vxl = 0
     }
-
+    // prevent paddle from leaving game area
     if(paddle.x + paddle.width >= canvasEl.width){
         paddle.vxr = 0
     }
@@ -237,44 +258,55 @@ function animatePaddle() {
 function animateBricks() {
     drawBricks()
 
-    bricksArr.forEach((row) => {
-        row.forEach((brick, i) => {
+    bricksArr.forEach((row, i) => {
+        row.forEach((brick, j) => {
             // detect top of bricks
             if (ball.x + ball.radius >= brick.x && 
                 ball.x - ball.radius <= brick.x + brick.width &&
                 ball.y + ball.radius >= brick.y &&
-                ball.y - ball.radius <= brick.y + brick.height * .2) {
+                ball.y - ball.radius <= brick.y + brick.height * .01) {
                     ball.vy *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
-                    row.splice(i, 1)
+                    row.splice(j, 1)
+                    score += 100
+                    blipSound.pause()
+                    if (sound === 'on') blipSound.play()
                     console.log('hit top')
             // detect bottom of bricks
             } else if(ball.x + ball.radius >= brick.x && 
                 ball.x - ball.radius <= brick.x + brick.width &&
-                ball.y - ball.radius >= brick.y + brick.height * .8 &&
-                ball.y + ball.radius <= brick.y + brick.height) {
+                ball.y + ball.radius >= brick.y + brick.height * .99 &&
+                ball.y - ball.radius <= brick.y + brick.height) {
                     ball.vy *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
-                    row.splice(i, 1)
+                    row.splice(j, 1)   
+                    score += 100
+                    blipSound.pause()
+                    if (sound === 'on') blipSound.play()
                     console.log('hit bottom')
-            }
             // detect left side of bricks
-            if (ball.x + ball.radius >= brick.x && 
-                ball.x - ball.radius <= brick.x + brick.width * .2 &&
+            } else if (ball.x + ball.radius >= brick.x && 
+                ball.x - ball.radius <= brick.x + brick.width * .01 &&
                 ball.y + ball.radius >= brick.y &&
                 ball.y - ball.radius <= brick.y + brick.height) {
                     ball.vx *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
-                    row.splice(i, 1)
+                    row.splice(j, 1)
+                    score += 100
+                    blipSound.pause()
+                    if (sound === 'on') blipSound.play()
                     console.log('hit left')
             // detect right side of bricks
-            } else if (ball.x - ball.radius >= brick.x + brick.width * .8 && 
-                ball.x + ball.radius <= brick.x + brick.width &&
+            } else if (ball.x + ball.radius >= brick.x + brick.width * .99 && 
+                ball.x - ball.radius <= brick.x + brick.width &&
                 ball.y + ball.radius >= brick.y &&
                 ball.y - ball.radius <= brick.y + brick.height) {
                     ball.vx *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
-                    row.splice(i, 1)
+                    row.splice(j, 1)
+                    score += 100
+                    blipSound.pause()
+                    if (sound === 'on') blipSound.play()
                     console.log('hit right')
             }
         })
@@ -301,6 +333,8 @@ making HTML canvas dynamic to browser window size:
 HTML canvas movement controls: 
     https://www.youtube.com/watch?v=kX18GQurDQg
 
+sounds:
+https://pixabay.com/sound-effects/search/game/
 
 
 
