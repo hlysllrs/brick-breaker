@@ -69,19 +69,29 @@ const brickLayout = {
 const bricksArr = []
 
 
-const blipSound = new Audio('sounds/blip-131856.mp3')
+const brickSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_008_17644.mp3')
+brickSound.volume = .1
+const hitSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3')
+hitSound.volume = .1
 const gameOverSound = new Audio ('sounds/game-over-arcade-6435.mp3')
+gameOverSound.volume = .1
 
 /*-----------------------------------------
 cached DOM elements
 ------------------------------------------*/
 const scoreEl = document.querySelector('#score')
 const livesEls = document.querySelectorAll('#life')
+const modal = document.querySelector('#intro-modal')
+const startBtn = document.querySelector('.start-button')
+
 
 
 /*-----------------------------------------
 event listeners
 ------------------------------------------*/
+// listen for begin button click
+startBtn.addEventListener('click', closeModal)
+
 // scale canvas and elements when window is resized
 window.addEventListener('resize', () => {
     // clear canvas
@@ -107,7 +117,7 @@ document.addEventListener('keyup', (e) => {
 
 // launch ball and allow animation when spacebar is pressed
 document.addEventListener('keydown', (e) => {
-    if(e.code == 'Space') {
+    if(e.code == 'Space' && modal.style.display === 'none') {
         animate()
     }
 })
@@ -115,15 +125,20 @@ document.addEventListener('keydown', (e) => {
 /*-----------------------------------------
 functions
 ------------------------------------------*/
-function start() {
+function init() {
     setCanvasSize()
     addBricksToArr()
+    drawBricks()
     drawBall()
     drawPaddle()
-    drawBricks()
 }
 
+// close button
+function closeModal() {
+    modal.style.display = 'none'
+}
 
+// reset screen after ball is missed
 function resetScreen() {
     setCanvasSize()
     drawBall()
@@ -131,6 +146,7 @@ function resetScreen() {
     drawBricks()
 }
 
+// get canvas size
 function setCanvasSize() {
     canvasEl.width = canvasEl.clientWidth
     canvasEl.height = canvasEl.width / 2
@@ -158,18 +174,21 @@ function addBricksToArr() {
     }
 }
 
+// draw the paddle in canvas
 function drawPaddle() {
-    ctx.fillStyle = 'blue'
+    ctx.fillStyle = '#000000'
     ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height)
 }
 
+// draw the ball in canvas
 function drawBall() {
     ctx.beginPath()
     ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, true)
-    ctx.fillStyle = 'red'
+    ctx.fillStyle = '#000000'
     ctx.fill()
 }
 
+// draw bricksin canvas
 function drawBricks() {
     bricksArr.forEach((row) => {
         row.forEach((brick) => {
@@ -179,7 +198,7 @@ function drawBricks() {
     })
 }
 
-
+// animate canvas
 function animate() {
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height)
 
@@ -211,11 +230,13 @@ function animateBall() {
     // detect side walls
     if(ball.x + ball.radius >= canvasEl.width || ball.x - ball.radius <= 0) {
         ball.vx *= -1
+        hitSound.play()
     }
 
     // detect top wall and paddle
     if(ball.y - ball.radius < 0) {
         ball.vy *= -1
+        hitSound.play()
     }
 
     // detect top of paddle
@@ -224,18 +245,21 @@ function animateBall() {
         ball.y + ball.radius > paddle.y && 
         ball.y - ball.radius < paddle.y + paddle.height) {
             ball.vy *= -1
+            hitSound.play()
     // detect left side of paddle
     } else if (ball.x + ball.radius >= paddle.x && 
         ball.x - ball.radius <= paddle.x + paddle.width * .01 &&
         ball.y + ball.radius >= paddle.y && 
         ball.y - ball.radius <= paddle.y + paddle.height) {
             ball.vx *= -1
+            hitSound.play()
     // detect right side of paddle
     } else if (ball.x + ball.radius >= paddle.x && 
         ball.x - ball.radius <= paddle.x + paddle.width * .99 &&
         ball.y + ball.radius >= paddle.y &&
         ball.y - ball.radius <= paddle.y + paddle.height) {
             ball.vx *= -1
+            hitSound.play()
     } 
 }
 
@@ -269,8 +293,8 @@ function animateBricks() {
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
                     score += 100
-                    blipSound.pause()
-                    if (sound === 'on') blipSound.play()
+                    brickSound.pause()
+                    brickSound.play()
                     console.log('hit top')
             // detect bottom of bricks
             } else if(ball.x + ball.radius >= brick.x && 
@@ -281,8 +305,8 @@ function animateBricks() {
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)   
                     score += 100
-                    blipSound.pause()
-                    if (sound === 'on') blipSound.play()
+                    brickSound.pause()
+                    brickSound.play()
                     console.log('hit bottom')
             // detect left side of bricks
             } else if (ball.x + ball.radius >= brick.x && 
@@ -293,8 +317,8 @@ function animateBricks() {
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
                     score += 100
-                    blipSound.pause()
-                    if (sound === 'on') blipSound.play()
+                    brickSound.pause()
+                    brickSound.play()
                     console.log('hit left')
             // detect right side of bricks
             } else if (ball.x + ball.radius >= brick.x + brick.width * .99 && 
@@ -305,19 +329,15 @@ function animateBricks() {
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
                     score += 100
-                    blipSound.pause()
-                    if (sound === 'on') blipSound.play()
+                    brickSound.pause()
+                    brickSound.play()
                     console.log('hit right')
             }
         })
     })
 }
 
-
-start()
-
-
-
+init()
 
 /*
 ------------------------------------------

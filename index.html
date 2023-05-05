@@ -6,24 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script defer src="app.js"></script>
     <link rel="stylesheet" href="style.css">
-    <title>a brick breaker game</title>
+    <title>a brick breaker game™</title>
 </head>
 <body>
-    <h1>a brick breaker game</h1>
     <div id="game-container">
         <header>
-            <p id="score">score: 0000000</p>
-            <div id="lives-container">
-                <p>lives:</p>
-                <div class="life" id="first-life"></div>
-                <div class="life" id="second-life"></div>
-                <div class="life" id="third-life"></div>
+            <p>a brick breaker game™</p>
+            <div id="stats">
+                <p id="player">player one</p>
+                <p id="score">score: 0</p>
+                <div id="lives-container">
+                    <p>lives: </p>
+                    <div class="life" id="first-life"></div>
+                    <div class="life" id="second-life"></div>
+                    <div class="life" id="third-life"></div>
+                </div>
             </div>
         </header>
         <canvas id="canvas">game not supported in browser</canvas>
     </div>
-    <aside id="game-options">
-        <p id = menu>menu</p>
-    </aside>
+    <div id="intro-modal" class="modal">
+        <div class="modal-content">
+            <p>welcome to <br>a brick breaker game™</p>
+            <p>use the space bar to launch the ball</p>
+            <p>use the left and right arrow keys to move the paddle</p>
+            <p>adjust game settings in the menu</p>
+            <div class="center-btn">
+                <button class="start-button">start</button>
+            </div>
+        </div>
+    </div>
+    <p id="menu-button">menu</p>
+    <div id="options-menu" class="menu"> 
+        <p>menu</p>
+        <div id="diff-level">
+            <p id="diff">difficulty</p>
+            <button id="easy">easy</button>
+            <button id="medium">medium</button>
+            <button id="hard">hard</button>
+        </div>
+        <div id="player-num">
+            <p id="players">players</p>
+            <button id="one-player">one</button>
+            <button id="two-players">two</button>
+        </div>
+        <div id="sound-level">
+            <p id="sound">sound</p>
+            <button id="sound-on">on</button>
+            <button id="sound-off">off</button>
+            <br>
+            <input type="range" id="volume" name="volume" min="0" max="100" steps="10">
+            <label for="volume">volume</label>
+
+        </div>
+    </div>
 </body>
 </html>
