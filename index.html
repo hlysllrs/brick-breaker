@@ -16,7 +16,7 @@
                 <p id="player">player one</p>
                 <p id="score">score: 0</p>
                 <div id="lives-container">
-                    <p>lives: </p>
+                    <p>lives:</p>
                     <div class="life" id="first-life"></div>
                     <div class="life" id="second-life"></div>
                     <div class="life" id="third-life"></div>
@@ -38,26 +38,32 @@
     </div>
     <p id="menu-button">menu</p>
     <div id="options-menu" class="menu"> 
-        <p>menu</p>
-        <div id="diff-level">
-            <p id="diff">difficulty</p>
-            <button id="easy">easy</button>
-            <button id="medium">medium</button>
-            <button id="hard">hard</button>
-        </div>
-        <div id="player-num">
-            <p id="players">players</p>
-            <button id="one-player">one</button>
-            <button id="two-players">two</button>
-        </div>
-        <div id="sound-level">
-            <p id="sound">sound</p>
-            <button id="sound-on">on</button>
-            <button id="sound-off">off</button>
-            <br>
-            <input type="range" id="volume" name="volume" min="0" max="100" steps="10">
-            <label for="volume">volume</label>
-
+        <div class="menu-content">
+            <div class="menu-header">
+                <p id="menu-name">menu</p>
+                <p id="close-button">&times;</p>
+            </div>
+            <div class="menu-section" id="diff-level">
+                <p class="section-label">difficulty</p>
+                <button class="opt-button diff-button" id="easy">easy</button>
+                <button class="opt-button diff-button" id="medium">medium</button>
+                <button class="opt-button diff-button" id="hard">hard</button>
+            </div>
+            <div class="menu-section" id="player-num">
+                <p class="section-label">players</p>
+                <button class="opt-button player-button" id="one-player">one</button>
+                <button class="opt-button player-button" id="two-players">two</button>
+            </div>
+            <div class="menu-section" id="sound">
+                <p class="section-label">sound</p>
+                <button class="opt-button sound-button" id="sound-on">on</button>
+                <button class="opt-button sound-button" id="sound-off">off</button>
+            </div>
+            <div class="menu-section">
+                <p class="section-label">volume</p>
+                <input type="range" id="volume" name="volume" min="0" max="100" steps="10">
+            </div>
+            
         </div>
     </div>
 </body>

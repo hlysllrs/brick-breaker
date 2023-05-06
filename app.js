@@ -31,7 +31,53 @@ variables
 let score = 0
 const lives = [1, 1, 1]
 
-let sound = 'on'
+let numOfPlayers = 1
+let currentPlayer = 1
+
+const players = {
+    1: {
+        playerName: 'player one',
+        score: 0,
+        lives: [1, 1, 1],
+        bricks: []
+    }, 
+    '-1': {
+        playerName: 'player two',
+        score: 0,
+        lives: [1, 1, 1],
+        bricks: []
+    }
+}
+
+let currentDifficulty = 'easy'
+
+// const difficulties = {
+//     easy: {
+//         ballRadius: , 
+//         ballVX: , 
+//         ballVY: , 
+//         paddleWidth: , 
+//     }, 
+//     medium: {
+//         ballRadius: , 
+//         ballVX: , 
+//         ballVY: , 
+//         paddleWidth: , 
+//     }, 
+//     hard: {
+//         ballRadius: , 
+//         ballVX: , 
+//         ballVY: , 
+//         paddleWidth: , 
+//     }
+
+// }
+
+const sound = {
+    status: 'on',
+    volumeLevel: 0.1
+}
+
 
 
 // define ball layout
@@ -70,11 +116,11 @@ const bricksArr = []
 
 
 const brickSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_008_17644.mp3')
-brickSound.volume = .1
+brickSound.volume = sound.volumeLevel
 const hitSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3')
-hitSound.volume = .1
+hitSound.volume = sound.volumeLevel
 const gameOverSound = new Audio ('sounds/game-over-arcade-6435.mp3')
-gameOverSound.volume = .1
+gameOverSound.volume = sound.volumeLevel
 
 /*-----------------------------------------
 cached DOM elements
@@ -83,8 +129,13 @@ const scoreEl = document.querySelector('#score')
 const livesEls = document.querySelectorAll('#life')
 const modal = document.querySelector('#intro-modal')
 const startBtn = document.querySelector('.start-button')
-
-
+const menu = document.querySelector('.menu')
+const menuBtn = document.querySelector('#menu-button')
+const closeBtn = document.querySelector('#close-button')
+const diffBtns = document.querySelectorAll('.diff-button')
+const playerBtns = document.querySelectorAll('.player-button')
+const soundBtns = document.querySelectorAll('.sound-button')
+const volSlider = document.querySelector('#volume')
 
 /*-----------------------------------------
 event listeners
@@ -92,15 +143,48 @@ event listeners
 // listen for begin button click
 startBtn.addEventListener('click', closeModal)
 
-// scale canvas and elements when window is resized
-window.addEventListener('resize', () => {
-    // clear canvas
-    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height)
+// listen for menu button click
+menuBtn.addEventListener('click', toggleMenu)
 
-    // redraw canvas and elements
-    setCanvasSize()
-    drawPaddle()
-    drawBall()
+// listen for menu close button click
+closeBtn.addEventListener('click', toggleMenu)
+
+// listen for difficulty buttons
+diffBtns.forEach((button) => {
+    button.addEventListener('click', () => {
+        difficulty = button.innerText
+
+        console.log(difficulty)
+    })
+
+    // if (menu.style.display === 'block'){
+    //     if (difficulty === button.innerText) {
+    //         button.style.color = '#f4f4f4'
+    //         button.style.backgroundColor = '#000000'
+    //     }
+    // }
+})
+
+// listen for player num buttons
+playerBtns.forEach((button) => {
+    button.addEventListener('click', () => {
+        if(button.innerText === 'one'){
+            numOfPlayers = 1
+        } else if (button.innerText === 'two') {
+            numOfPlayers = 2
+        }
+
+        console.log(numOfPlayers)
+    })
+})
+
+// listen for sound buttons
+soundBtns.forEach((button) => {
+    button.addEventListener('click', () => {
+        sound.status = button.innerText
+
+        console.log(sound.status)
+    })
 })
 
 // move paddle when arrow keys are pressed
@@ -133,10 +217,19 @@ function init() {
     drawPaddle()
 }
 
-// close button
+// close modal changing display to 'none'
 function closeModal() {
     modal.style.display = 'none'
 }
+
+// open menu
+function toggleMenu() {
+    if(menu.style.display === 'none') {
+        menu.style.display = 'block'
+    } else {
+    menu.style.display = 'none'
+    }
+} 
 
 // reset screen after ball is missed
 function resetScreen() {
@@ -152,8 +245,34 @@ function setCanvasSize() {
     canvasEl.height = canvasEl.width / 2
 }
 
+// clear all elements on canvas
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height)
+}
+
 // create brick layout
 function addBricksToArr() {
+    // for (let player in players) {
+    //     for(i = 0; i < brickLayout.rows; i++) {
+    //         const brickRow = []
+    //         for(j = 0; j < brickLayout.columns; j++) {
+    //             const brick = {
+    //                 x: brickLayout.x,
+    //                 y: brickLayout.y,
+    //                 width: brickLayout.width,
+    //                 height: brickLayout.height,
+    //                 color: brickLayout.colors[i]
+    //             }
+    //             brickRow.push(brick)
+    //             brickLayout.x += brickLayout.width + brickLayout.xOffset
+    
+    //         }
+    //         player.bricks.push(brickRow)
+    //         brickLayout.y += brickLayout.height + brickLayout.yOffset
+    //         brickLayout.x = canvasEl.width * .055
+    //     }
+    // }
+
     for(i = 0; i < brickLayout.rows; i++) {
         const brickRow = []
         for(j = 0; j < brickLayout.columns; j++) {
@@ -200,7 +319,7 @@ function drawBricks() {
 
 // animate canvas
 function animate() {
-    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height)
+    clearCanvas()
 
     animateBall()
     animatePaddle()
