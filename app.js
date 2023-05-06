@@ -3,11 +3,12 @@ PUZZLES TO SOLVE:
 - move ball
     - fine tune movement directions?
     - ball accelerated when spacebar is pushed again??
-- collision detection
+- collision detection --> maybe use switch cases??? 
     - collisions with side of paddle
     - collisions with bricks 
         - sides and bottom??
 - sound doesn't play for every brick hit --> need shorter sound clip??
+- center paddle for each difficulty
 - lives
 - game over
 - 1 or 2 players
@@ -49,42 +50,42 @@ const players = {
     }
 }
 
-let currentDifficulty = 'easy'
+let currentDifficulty = 'hard'
 
-// const difficulties = {
-//     easy: {
-//         ballRadius: , 
-//         ballVX: , 
-//         ballVY: , 
-//         paddleWidth: , 
-//     }, 
-//     medium: {
-//         ballRadius: , 
-//         ballVX: , 
-//         ballVY: , 
-//         paddleWidth: , 
-//     }, 
-//     hard: {
-//         ballRadius: , 
-//         ballVX: , 
-//         ballVY: , 
-//         paddleWidth: , 
-//     }
-
-// }
+const difficulties = {
+    easy: {
+        ballRadius: canvasEl.height / 50, 
+        ballVX: 1, 
+        ballVY: 3, 
+        paddleWidth: canvasEl.width / 10,
+        paddleSpeed: 5
+    }, 
+    medium: {
+        ballRadius: canvasEl.height / 60, 
+        ballVX: 2, 
+        ballVY: 4, 
+        paddleWidth: canvasEl.width / 12, 
+        paddleSpeed: 7
+    }, 
+    hard: {
+        ballRadius: canvasEl.height / 70, 
+        ballVX: 3, 
+        ballVY: 5, 
+        paddleWidth: canvasEl.width / 15, 
+        paddleSpeed: 9
+    }
+}
 
 const sound = {
     status: 'on',
     volumeLevel: 0.1
 }
 
-
-
 // define ball layout
 const ball = {
+    y: canvasEl.height - 31,
     x: canvasEl.width / 2,
-    y: canvasEl.height -31,
-    radius: 7,
+    radius: canvasEl.height / 50,
     vx: -2,
     vy: -4
 }
@@ -132,8 +133,11 @@ const startBtn = document.querySelector('.start-button')
 const menu = document.querySelector('.menu')
 const menuBtn = document.querySelector('#menu-button')
 const closeBtn = document.querySelector('#close-button')
+const diffBtnCont = document.querySelector('#diff-button-container')
 const diffBtns = document.querySelectorAll('.diff-button')
+const playerBtnCont = document.querySelector('#player-button-container')
 const playerBtns = document.querySelectorAll('.player-button')
+const soundBtnCont = document.querySelector('#sound-button-container')
 const soundBtns = document.querySelectorAll('.sound-button')
 const volSlider = document.querySelector('#volume')
 
@@ -150,47 +154,62 @@ menuBtn.addEventListener('click', toggleMenu)
 closeBtn.addEventListener('click', toggleMenu)
 
 // listen for difficulty buttons
-diffBtns.forEach((button) => {
-    button.addEventListener('click', () => {
-        difficulty = button.innerText
+diffBtnCont.addEventListener('click', (e) => {
 
-        console.log(difficulty)
-    })
+    if (e.target.nodeName !== 'BUTTON') return
+    
+    // // reset color of all difficulty buttons
+    // diffBtns.forEach((btn) => {
+    //     btn.style.color = '#000000'
+    //     btn.style.backgroundColor = '#f4f4f4'
+    // })
+    // change current difficulty to selected button
+    currentDifficulty = e.target.id
 
-    // if (menu.style.display === 'block'){
-    //     if (difficulty === button.innerText) {
-    //         button.style.color = '#f4f4f4'
-    //         button.style.backgroundColor = '#000000'
-    //     }
-    // }
+    // // change style of button to indicate selected difficulty
+    // e.target.style.color = '#f4f4f4'
+    // e.target.style.backgroundColor = '#000000'
+    setMenuSelections()
+
+    // render game with new difficulty
+    clearCanvas()
+    setDifficulty()
+    resetScreen()
+    console.log(currentDifficulty)
 })
 
 // listen for player num buttons
-playerBtns.forEach((button) => {
-    button.addEventListener('click', () => {
-        if(button.innerText === 'one'){
-            numOfPlayers = 1
-        } else if (button.innerText === 'two') {
-            numOfPlayers = 2
-        }
+playerBtnCont.addEventListener('click', (e) => {
 
-        console.log(numOfPlayers)
-    })
+    if (e.target.nodeName !== 'BUTTON') return
+
+    // change number of players to selected button
+    const val = e.target.id.replace(/players-/, '')
+    numOfPlayers = val
+
+    console.log(numOfPlayers)
+
+    setMenuSelections()
 })
 
-// listen for sound buttons
-soundBtns.forEach((button) => {
-    button.addEventListener('click', () => {
-        sound.status = button.innerText
+// // listen for sound buttons
+soundBtnCont.addEventListener('click', (e) => {
 
-        console.log(sound.status)
-    })
+    if (e.target.nodeName !== 'BUTTON') return
+
+    // change sound status to selected button
+    const val = e.target.id.replace(/sound-/, '')
+    sound.status = val
+
+    console.log(sound.status)
+
+    setMenuSelections()
 })
 
 // move paddle when arrow keys are pressed
 document.addEventListener('keydown', (e) => {
-    if(e.code === 'ArrowLeft' && paddle.x >= 0) paddle.vxl = -7
-    if(e.code === 'ArrowRight' && paddle.x + paddle.width <= canvasEl.width) paddle.vxr = 7
+    if(e.code === 'ArrowLeft' && paddle.x >= 0) paddle.vxl = difficulties[currentDifficulty].paddleSpeed * -1
+    if(e.code === 'ArrowRight' && paddle.x + paddle.width <= canvasEl.width) paddle.vxr = difficulties[currentDifficulty].paddleSpeed
 })
 
 // stop paddle when arrow keys are released
@@ -212,6 +231,7 @@ functions
 function init() {
     setCanvasSize()
     addBricksToArr()
+    setDifficulty()
     drawBricks()
     drawBall()
     drawPaddle()
@@ -224,12 +244,55 @@ function closeModal() {
 
 // open menu
 function toggleMenu() {
+    setMenuSelections()
     if(menu.style.display === 'none') {
         menu.style.display = 'block'
     } else {
     menu.style.display = 'none'
     }
 } 
+
+// show current game options in menu
+function setMenuSelections() {
+    diffBtns.forEach((btn) =>{
+        if (btn.id == currentDifficulty) {
+            btn.style.color = '#f4f4f4'
+            btn.style.backgroundColor = '#000000'
+        } else {
+            btn.style.color = '#000000'
+            btn.style.backgroundColor = '#f4f4f4'
+        }
+    })
+
+    playerBtns.forEach((btn) =>{
+        const val = btn.id.replace(/players-/, '')
+        if (val == numOfPlayers) {
+            btn.style.color = '#f4f4f4'
+            btn.style.backgroundColor = '#000000'
+        } else {
+            btn.style.color = '#000000'
+            btn.style.backgroundColor = '#f4f4f4'
+        }
+    })
+
+    soundBtns.forEach((btn) =>{
+        const val = btn.id.replace(/sound-/, '')
+        if (val == sound.status) {
+            btn.style.color = '#f4f4f4'
+            btn.style.backgroundColor = '#000000'
+        } else {
+            btn.style.color = '#000000'
+            btn.style.backgroundColor = '#f4f4f4'
+        }
+    })
+}
+
+function setDifficulty() {
+    ball.radius = difficulties[currentDifficulty].ballRadius
+    ball.vx = difficulties[currentDifficulty].ballVX
+    ball.vy = difficulties[currentDifficulty].ballVY
+    paddle.width = difficulties[currentDifficulty].paddleWidth
+}
 
 // reset screen after ball is missed
 function resetScreen() {
