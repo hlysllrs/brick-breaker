@@ -10,8 +10,11 @@ PUZZLES TO SOLVE:
 - sound doesn't play for every brick hit --> need shorter sound clip??
 - center paddle for each difficulty
 - game over
+    - implement for 2 players
 - wins
-- 1 or 2 players
+    - implement for 1 player
+    - implement for 2 players
+- tie if both players clear all bricks
 */
 
 /*-----------------------------------------
@@ -27,26 +30,25 @@ canvasEl.height = canvasEl.width / 2
 /*-----------------------------------------
 variables
 ------------------------------------------*/
-let score = 0
-const lives = [1, 1, 1]
-
 let numOfPlayers = 1
 let currentPlayer = 1
 
-// const players = {
-//     1: {
-//         playerName: 'player one',
-//         score: 0,
-//         lives: [1, 1, 1],
-//         bricks: []
-//     }, 
-//     '-1': {
-//         playerName: 'player two',
-//         score: 0,
-//         lives: [1, 1, 1],
-//         bricks: []
-//     }
-// }
+const players = {
+    1: {
+        playerName: 'player one',
+        score: 0,
+        lives: [1, 1, 1],
+        bricks: []
+    }, 
+    '-1': {
+        playerName: 'player two',
+        score: 0,
+        lives: [1, 1, 1],
+        bricks: []
+    }
+}
+
+let winner = null
 
 let currentDifficulty = 'hard'
 
@@ -127,6 +129,7 @@ cached DOM elements
 ------------------------------------------*/
 const scoreEl = document.querySelector('#score')
 const lifeEls = document.querySelectorAll('.life')
+const playerEl = document.querySelector('#player')
 const introModal = document.querySelector('#intro-modal')
 const startBtn = document.querySelector('.start-button')
 const menu = document.querySelector('.menu')
@@ -185,6 +188,7 @@ playerBtnCont.addEventListener('click', (e) => {
 
     // update selections in options menu
     setMenuSelections()
+    restartGame()
 })
 
 // listen for sound buttons
@@ -226,8 +230,7 @@ function init() {
     setCanvasSize()
     addBricksToArr()
     setDifficulty()
-    displayLives()
-    displayScore()
+    displayCurrentPlayer()
     drawBricks()
     drawBall()
     drawPaddle()
@@ -240,7 +243,6 @@ function toggleIntroModal() {
     } else {
         introModal.style.display = 'none'
     }
-
 }
 
 // open / close menu
@@ -298,6 +300,7 @@ function setDifficulty() {
 // reset screen after ball is missed
 function resetScreen() {
     setCanvasSize()
+    displayCurrentPlayer()
     drawBall()
     drawPaddle()
     drawBricks()
@@ -316,44 +319,26 @@ function clearCanvas() {
 
 // create brick layout
 function addBricksToArr() {
-    // for (let player in players) {
-    //     for(i = 0; i < brickLayout.rows; i++) {
-    //         const brickRow = []
-    //         for(j = 0; j < brickLayout.columns; j++) {
-    //             const brick = {
-    //                 x: brickLayout.x,
-    //                 y: brickLayout.y,
-    //                 width: brickLayout.width,
-    //                 height: brickLayout.height,
-    //                 color: brickLayout.colors[i]
-    //             }
-    //             brickRow.push(brick)
-    //             brickLayout.x += brickLayout.width + brickLayout.xOffset
+    for(let player in players) {
+        for(i = 0; i < brickLayout.rows; i++) {
+            const brickRow = []
+            for(j = 0; j < brickLayout.columns; j++) {
+                const brick = {
+                    x: brickLayout.x,
+                    y: brickLayout.y,
+                    width: brickLayout.width,
+                    height: brickLayout.height,
+                    color: brickLayout.colors[i]
+                }
+                brickRow.push(brick)
+                brickLayout.x += brickLayout.width + brickLayout.xOffset
     
-    //         }
-    //         player.bricks.push(brickRow)
-    //         brickLayout.y += brickLayout.height + brickLayout.yOffset
-    //         brickLayout.x = canvasEl.width * .055
-    //     }
-    // }
-
-    for(i = 0; i < brickLayout.rows; i++) {
-        const brickRow = []
-        for(j = 0; j < brickLayout.columns; j++) {
-            const brick = {
-                x: brickLayout.x,
-                y: brickLayout.y,
-                width: brickLayout.width,
-                height: brickLayout.height,
-                color: brickLayout.colors[i]
             }
-            brickRow.push(brick)
-            brickLayout.x += brickLayout.width + brickLayout.xOffset
-
+            players[player].bricks.push(brickRow)
+            brickLayout.y += brickLayout.height + brickLayout.yOffset
+            brickLayout.x = canvasEl.width * .055
         }
-        bricksArr.push(brickRow)
-        brickLayout.y += brickLayout.height + brickLayout.yOffset
-        brickLayout.x = canvasEl.width * .055
+        brickLayout.y = canvasEl.height * .05
     }
 }
 
@@ -371,9 +356,9 @@ function drawBall() {
     ctx.fill()
 }
 
-// draw bricksin canvas
+// draw bricks in canvas
 function drawBricks() {
-    bricksArr.forEach((row) => {
+    players[currentPlayer].bricks.forEach((row) => {
         row.forEach((brick) => {
             ctx.fillStyle = brick.color
             ctx.fillRect(brick.x, brick.y, brick.width, brick.height)
@@ -388,7 +373,7 @@ function animate() {
     animatePaddle()
     animateBricks()
     
-    displayScore()
+    displayCurrentPlayer()
 
     // check if ball is within canvas area
     if(ball.y - ball.radius > canvasEl.height) {
@@ -467,7 +452,7 @@ function animatePaddle() {
 function animateBricks() {
     drawBricks()
 
-    bricksArr.forEach((row, i) => {
+    players[currentPlayer].bricks.forEach((row, i) => {
         row.forEach((brick, j) => {
             // detect top of bricks
             if (ball.x + ball.radius >= brick.x && 
@@ -477,7 +462,7 @@ function animateBricks() {
                     ball.vy *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
-                    score += 100
+                    players[currentPlayer].score += 100
                     brickSound.pause()
                     brickSound.play()
                     console.log('hit top')
@@ -489,7 +474,7 @@ function animateBricks() {
                     ball.vy *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)   
-                    score += 100
+                    players[currentPlayer].score += 100
                     brickSound.pause()
                     brickSound.play()
                     console.log('hit bottom')
@@ -501,7 +486,7 @@ function animateBricks() {
                     ball.vx *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
-                    score += 100
+                    players[currentPlayer].score += 100
                     brickSound.pause()
                     brickSound.play()
                     console.log('hit left')
@@ -513,7 +498,7 @@ function animateBricks() {
                     ball.vx *= -1
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
-                    score += 100
+                    players[currentPlayer].score += 100
                     brickSound.pause()
                     brickSound.play()
                     console.log('hit right')
@@ -524,7 +509,7 @@ function animateBricks() {
 
 function loseLife() {
     // check for first 1 (usable life) in lives array
-    const lifeIdx = lives.indexOf(1)
+    const lifeIdx = players[currentPlayer].lives.indexOf(1)
 
     console.log(lifeIdx)
     // if no usable lives present, game over
@@ -532,16 +517,11 @@ function loseLife() {
         gameOver()
     } else {
         // change life value to 0
-        lives[lifeIdx] = 0
-
-         // update lives on DOM
-        displayLives()
+        players[currentPlayer].lives[lifeIdx] = 0
     }
 
-    console.log(lives)
-
-    // change players
-    // currentPlayer *= -1
+    // change players if in two player mode
+    if(numOfPlayers == 2) currentPlayer *= -1
 }
 
 // show game over modal
@@ -549,45 +529,51 @@ function gameOver() {
     gameOverModal.style.display = 'block'
 }
 
-// update lives on screen
-function displayLives() {
-    lives.forEach((life, i) => {
+function displayCurrentPlayer() {
+    // display player name
+    playerEl.innerText = players[currentPlayer].playerName
+
+    // display score
+    scoreEl.innerHTML = `score: ${players[currentPlayer].score}`
+
+    // display lives
+    players[currentPlayer].lives.forEach((life, i) => {
         switch (life) {
             case 0: 
+                // if life is 0, display as empty
                 lifeEls[i].style.backgroundColor = '#f4f4f4'
                 break
             case 1: 
+                // if life is 1, display as filled
                 lifeEls[i].style.backgroundColor = '#000000'
                 break
         }
     })
 }
 
-// update score on screen
-function displayScore() {
-    scoreEl.innerHTML = `score: ${score}`
-}
-
 function restartGame() {
     // hide game over modal
     gameOverModal.style.display = 'none'
-
-    // remove all remaining bricks from bricks array
-    bricksArr.forEach((brick) => {
-        bricksArr.pop()
-    })
+    
+    for(let player in players) {
+        // remove all remaining bricks from bricks each player's array
+        players[player].bricks.splice(0, players[player].bricks.length)
+        // reset each player's score to 0
+        players[player].score = 0
+        // reset each player to full lives
+        players[player].lives.splice(0, 3, 1, 1, 1)
+    }
 
     // reset brick layout start positions
     brickLayout.x = canvasEl.width * .055, 
     brickLayout.y = canvasEl.height * .05, 
 
-    // reset score and lives
-    score = 0
-    lives.splice(0, 3, 1, 1, 1)
+    // reset current player to player one
+    currentPlayer = 1
 
     // re-initialize game and show start modal
     init()
-    toggleIntroModal()
+    // toggleIntroModal()
 }
 
 
