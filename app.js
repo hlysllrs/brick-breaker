@@ -15,6 +15,7 @@ PUZZLES TO SOLVE:
     - implement for 1 player
     - implement for 2 players
 - tie if both players clear all bricks
+- improve responsive layout
 */
 
 /*-----------------------------------------
@@ -63,14 +64,14 @@ const difficulties = {
     medium: {
         ballRadius: canvasEl.height / 70, 
         ballVX: 2, 
-        ballVY: 4, 
+        ballVY: 6, 
         paddleWidth: canvasEl.width / 12, 
         paddleSpeed: 7
     }, 
     hard: {
         ballRadius: canvasEl.height / 80, 
         ballVX: 3, 
-        ballVY: 5, 
+        ballVY: 9, 
         paddleWidth: canvasEl.width / 15, 
         paddleSpeed: 9
     }
@@ -81,23 +82,23 @@ const sound = {
     volumeLevel: 0.1
 }
 
-// define ball layout
-const ball = {
-    y: canvasEl.height - 31,
-    x: canvasEl.width / 2,
-    radius: canvasEl.height / 50,
-    vx: -2,
-    vy: -4
-}
-
 // define paddle layout
 const paddle = {
-    x: canvasEl.width / 2 - (canvasEl.width / 10 / 2),
+    x: canvasEl.width / 2 - (difficulties[currentDifficulty].paddleWidth / 2),
     y: canvasEl.height - 20,
     width: canvasEl.width / 10,
     height: 10,
     vxl: 0,
     vxr: 0
+}
+
+// define ball layout
+const ball = {
+    y: paddle.y - difficulties[currentDifficulty].ballRadius - 1,
+    x: canvasEl.width / 2,
+    radius: canvasEl.height / 50,
+    vx: -2,
+    vy: -4
 }
 
 // define brick layout
@@ -174,7 +175,7 @@ diffBtnCont.addEventListener('click', (e) => {
     // render game with new difficulty
     clearCanvas()
     setDifficulty()
-    resetScreen()
+    restartGame()
 })
 
 // listen for player num buttons
@@ -292,9 +293,11 @@ function setMenuSelections() {
 
 function setDifficulty() {
     ball.radius = difficulties[currentDifficulty].ballRadius
+    ball.y = paddle.y - difficulties[currentDifficulty].ballRadius - 1
     ball.vx = difficulties[currentDifficulty].ballVX
     ball.vy = difficulties[currentDifficulty].ballVY
     paddle.width = difficulties[currentDifficulty].paddleWidth
+    paddle.x = canvasEl.width / 2 - (difficulties[currentDifficulty].paddleWidth / 2)
 }
 
 // reset screen after ball is missed
@@ -552,6 +555,8 @@ function displayCurrentPlayer() {
 }
 
 function restartGame() {
+    clearCanvas()
+
     // hide game over modal
     gameOverModal.style.display = 'none'
     
@@ -573,7 +578,6 @@ function restartGame() {
 
     // re-initialize game and show start modal
     init()
-    // toggleIntroModal()
 }
 
 

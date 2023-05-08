@@ -51,9 +51,9 @@ header {
 }
 
 .life {
-    height: 2.5vh;
-    width: 2.5vh;
-    margin: 2px;;
+    height: 2vh;
+    width: 2vh;
+    margin: 2px;
     border-radius: 50%;
     border: 1px solid #000000;
     background-color: #000000;
