@@ -25,6 +25,7 @@
         </header>
         <canvas id="canvas">game not supported in browser</canvas>
     </div>
+
     <div id="intro-modal" class="modal">
         <div class="modal-content">
             <p>welcome to <br>a brick breaker game™</p>
@@ -36,6 +37,21 @@
             </div>
         </div>
     </div>
+
+    <div id="winner-modal" class="modal">
+        <div class="modal-content">
+            <div class="center">
+                <img src="images/smiley-face.png" id="smile"> 
+            </div>
+            <p>you win</p>
+            <p id="winner">congrats</p>
+            <p>press restart to play again</p>
+            <div class="center">
+                <button class="restart-button" id="win-restart">restart</button>
+            </div>
+        </div>
+    </div>
+
     <div id="game-over-modal" class="modal">
         <div class="modal-content">
             <div class="center">
@@ -45,7 +61,7 @@
             <p>better luck next time</p>
             <p>press restart to play again</p>
             <div class="center">
-                <button class="restart-button">restart</button>
+                <button class="restart-button" id="lose-restart">restart</button>
             </div>
         </div>
     </div>
@@ -61,7 +77,7 @@
                 <p class="section-label">difficulty</p>
                 <div id="diff-button-container">
                     <button class="opt-button diff-button" id="easy">easy</button>
-                    <button class="opt-button diff-button" id="medium">medium</button>
+                    <button class="opt-button diff-button" id="medium">med</button>
                     <button class="opt-button diff-button" id="hard">hard</button>
                 </div>
             </div>

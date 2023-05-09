@@ -91,12 +91,11 @@ header {
 
 }
 
-#game-over-modal {
+#game-over-modal, #winner-modal {
     display: none;
-
 }
 
-#frown {
+#frown, #smile {
     height: 8vh;
     margin-top: 10%;
 } 

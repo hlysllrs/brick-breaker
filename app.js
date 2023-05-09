@@ -14,7 +14,7 @@ PUZZLES TO SOLVE:
 - wins
     - implement for 1 player
     - implement for 2 players
-- tie if both players clear all bricks
+- tie if both players clear all bricks???
 - improve responsive layout
 */
 
@@ -51,7 +51,7 @@ const players = {
 
 let winner = null
 
-let currentDifficulty = 'hard'
+let currentDifficulty = 'easy'
 
 const difficulties = {
     easy: {
@@ -114,10 +114,6 @@ const brickLayout = {
     colors:['#e92e3d', '#ff9300','#ffcf02', '#00993c', '#5eb99b', '#028fe1', '#0052bc', '#995cc7', '#e64388']
 }
 
-// array to store brick positions and colors
-const bricksArr = []
-
-
 const brickSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_008_17644.mp3')
 brickSound.volume = sound.volumeLevel
 const hitSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3')
@@ -144,7 +140,9 @@ const soundBtnCont = document.querySelector('#sound-button-container')
 const soundBtns = document.querySelectorAll('.sound-button')
 const volSlider = document.querySelector('#volume')
 const gameOverModal = document.querySelector('#game-over-modal')
-const restartBtn = document.querySelector('.restart-button')
+const loseRestartBtn = document.querySelector('#lose-restart')
+const winnerModal = document.querySelector('#winner-modal')
+const winRestartBtn = document.querySelector('#win-restart')
 
 /*-----------------------------------------
 event listeners
@@ -153,7 +151,10 @@ event listeners
 startBtn.addEventListener('click', toggleIntroModal)
 
 // listen for restart button click (on game over modal)
-restartBtn.addEventListener('click', restartGame)
+loseRestartBtn.addEventListener('click', restartGame)
+
+// listen for restart button click (on winner modal)
+winRestartBtn.addEventListener('click', restartGame)
 
 // listen for menu button click
 menuBtn.addEventListener('click', toggleMenu)
@@ -375,7 +376,8 @@ function animate() {
     animateBall()
     animatePaddle()
     animateBricks()
-    
+
+    checkForWinner()
     displayCurrentPlayer()
 
     // check if ball is within canvas area
@@ -386,7 +388,8 @@ function animate() {
         paddle.y = canvasEl.height - 20,
         loseLife()
         resetScreen()
-    } else if(winner || gameOverModal.style.display === 'block') {
+    } else if(winnerModal.style.display === 'block' || gameOverModal.style.display === 'block') {
+        console.log(winner)
         return
     } else {
         requestAnimationFrame(animate)
@@ -514,7 +517,6 @@ function loseLife() {
     // check for first 1 (usable life) in lives array
     const lifeIdx = players[currentPlayer].lives.indexOf(1)
 
-    console.log(lifeIdx)
     // if no usable lives present, game over
     if(lifeIdx === -1) {
         gameOver()
@@ -527,9 +529,37 @@ function loseLife() {
     if(numOfPlayers == 2) currentPlayer *= -1
 }
 
+// check for winner
+function checkForWinner() {
+    // check if each player's bricks are cleared
+    for(let player in players) {
+        // count number of empty rows
+        let rowsCleared = 0
+        players[player].bricks.forEach((row) => {
+            if(row.length === 0) rowsCleared++
+        })
+
+        // if all rows are cleared, declare winner
+        if(rowsCleared === 9) {
+            winner = player
+            showWinner()
+        }
+    }
+}
+
 // show game over modal
 function gameOver() {
     gameOverModal.style.display = 'block'
+}
+
+// show winner modal
+function showWinner() {
+    // update DOM with winner name
+    const winnerEl = document.querySelector('#winner')
+    winnerEl.innerText = `congrats ${players[winner].playerName}`
+
+    // show winner modal
+    winnerModal.style.display = 'block'
 }
 
 function displayCurrentPlayer() {
@@ -557,8 +587,9 @@ function displayCurrentPlayer() {
 function restartGame() {
     clearCanvas()
 
-    // hide game over modal
+    // hide game over modal and winer modal
     gameOverModal.style.display = 'none'
+    winnerModal.style.display = 'none'
     
     for(let player in players) {
         // remove all remaining bricks from bricks each player's array
@@ -572,6 +603,9 @@ function restartGame() {
     // reset brick layout start positions
     brickLayout.x = canvasEl.width * .055, 
     brickLayout.y = canvasEl.height * .05, 
+
+    // reset ball x position
+    ball.x = canvasEl.width / 2
 
     // reset current player to player one
     currentPlayer = 1
