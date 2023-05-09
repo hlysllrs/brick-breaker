@@ -12,8 +12,7 @@ PUZZLES TO SOLVE:
 - game over
     - implement for 2 players
 - wins
-    - implement for 1 player
-    - implement for 2 players
+    - implement for 2 players (currently whoever loses first)
 - tie if both players clear all bricks???
 - improve responsive layout
 */
@@ -53,6 +52,7 @@ let winner = null
 
 let currentDifficulty = 'easy'
 
+// define ball and brick attributes for each difficulty
 const difficulties = {
     easy: {
         ballRadius: canvasEl.height / 60, 
@@ -75,11 +75,6 @@ const difficulties = {
         paddleWidth: canvasEl.width / 15, 
         paddleSpeed: 9
     }
-}
-
-const sound = {
-    status: 'on',
-    volumeLevel: 0.1
 }
 
 // define paddle layout
@@ -114,12 +109,28 @@ const brickLayout = {
     colors:['#e92e3d', '#ff9300','#ffcf02', '#00993c', '#5eb99b', '#028fe1', '#0052bc', '#995cc7', '#e64388']
 }
 
-const brickSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_008_17644.mp3')
-brickSound.volume = sound.volumeLevel
-const hitSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3')
-hitSound.volume = sound.volumeLevel
-const gameOverSound = new Audio ('sounds/game-over-arcade-6435.mp3')
-gameOverSound.volume = sound.volumeLevel
+const soundStats = {
+    status: 'on',
+    volumeLevel: 0.1
+}
+
+const sounds = {
+    brickSound: new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_008_17644.mp3'), 
+    hitSound: new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3'), 
+    gameOverSound: new Audio ('sounds/game-over-arcade-6435.mp3'), 
+    winSound: new Audio('sounds/esm_8_bit_small_win_arcade_80s_simple_alert_notification_game.mp3'), 
+    loseLifeSound: new Audio('sounds/blip-131856.mp3')
+}
+// const brickSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_008_17644.mp3')
+// brickSound.volume = sound.volumeLevel
+// const hitSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3')
+// hitSound.volume = sound.volumeLevel
+// const gameOverSound = new Audio ('sounds/game-over-arcade-6435.mp3')
+// gameOverSound.volume = sound.volumeLevel
+// const winSound = new Audio('sounds/esm_8_bit_small_win_arcade_80s_simple_alert_notification_game.mp3')
+// winSound.volume = sound.volumeLevel
+// const loseLifeSound = new Audio('sounds/blip-131856.mp3')
+// loseLifeSound.volume = sound.volumeLevel
 
 /*-----------------------------------------
 cached DOM elements
@@ -200,11 +211,14 @@ soundBtnCont.addEventListener('click', (e) => {
 
     // change sound status to selected button
     const val = e.target.id.replace(/sound-/, '')
-    sound.status = val
+    soundStats.status = val
 
     // update selections in options menu
     setMenuSelections()
 })
+
+// listen for volume slider
+volSlider.addEventListener('change', setVolume)
 
 // move paddle when arrow keys are pressed
 document.addEventListener('keydown', (e) => {
@@ -232,10 +246,20 @@ function init() {
     setCanvasSize()
     addBricksToArr()
     setDifficulty()
+    setVolume()
     displayCurrentPlayer()
     drawBricks()
     drawBall()
     drawPaddle()
+}
+
+// reset screen with current state
+function resetScreen() {
+    setCanvasSize()
+    displayCurrentPlayer()
+    drawBall()
+    drawPaddle()
+    drawBricks()
 }
 
 // close modal changing display to 'none'
@@ -282,7 +306,7 @@ function setMenuSelections() {
 
     soundBtns.forEach((btn) =>{
         const val = btn.id.replace(/sound-/, '')
-        if (val == sound.status) {
+        if (val == soundStats.status) {
             btn.style.color = '#f4f4f4'
             btn.style.backgroundColor = '#000000'
         } else {
@@ -301,14 +325,24 @@ function setDifficulty() {
     paddle.x = canvasEl.width / 2 - (difficulties[currentDifficulty].paddleWidth / 2)
 }
 
-// reset screen after ball is missed
-function resetScreen() {
-    setCanvasSize()
-    displayCurrentPlayer()
-    drawBall()
-    drawPaddle()
-    drawBricks()
+function setVolume() {
+    // set volume to slider value
+    soundStats.volume = volSlider.value / 100
+
+    // set volume of each sound
+    for(let sound in sounds) {
+        sounds[sound].volume = soundStats.volume
+    }
+
+    // if volume slider is at 0, set sound status to off
+    if(soundStats.volume === 0) soundStats.status =  'off'
+    else soundStats.status = 'on'
+
+    // update button selections on menu
+    setMenuSelections()
 }
+
+
 
 // get canvas size
 function setCanvasSize() {
@@ -406,13 +440,13 @@ function animateBall() {
     // detect side walls
     if(ball.x + ball.radius >= canvasEl.width || ball.x - ball.radius <= 0) {
         ball.vx *= -1
-        hitSound.play()
+        if(soundStats.status === 'on') sounds.hitSound.play()
     }
 
     // detect top wall and paddle
     if(ball.y - ball.radius < 0) {
         ball.vy *= -1
-        hitSound.play()
+        if(soundStats.status === 'on') sounds.hitSound.play()
     }
 
     // detect top of paddle
@@ -421,21 +455,21 @@ function animateBall() {
         ball.y + ball.radius > paddle.y && 
         ball.y - ball.radius < paddle.y + paddle.height) {
             ball.vy *= -1
-            hitSound.play()
+            if(soundStats.status === 'on') sounds.hitSound.play()
     // detect left side of paddle
     } else if (ball.x + ball.radius >= paddle.x && 
         ball.x - ball.radius <= paddle.x + paddle.width * .01 &&
         ball.y + ball.radius >= paddle.y && 
         ball.y - ball.radius <= paddle.y + paddle.height) {
             ball.vx *= -1
-            hitSound.play()
+            if(soundStats.status === 'on') sounds.hitSound.play()
     // detect right side of paddle
     } else if (ball.x + ball.radius >= paddle.x && 
         ball.x - ball.radius <= paddle.x + paddle.width * .99 &&
         ball.y + ball.radius >= paddle.y &&
         ball.y - ball.radius <= paddle.y + paddle.height) {
             ball.vx *= -1
-            hitSound.play()
+            if(soundStats.status === 'on') sounds.hitSound.play()
     } 
 }
 
@@ -465,12 +499,15 @@ function animateBricks() {
                 ball.x - ball.radius <= brick.x + brick.width &&
                 ball.y + ball.radius >= brick.y &&
                 ball.y - ball.radius <= brick.y + brick.height * .01) {
+                    // reverse ball y direction
                     ball.vy *= -1
+                    // clear brick and remove from array
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
+                    // increase score
                     players[currentPlayer].score += 100
-                    brickSound.pause()
-                    brickSound.play()
+                    // play sound (if sound is on)
+                    if(soundStats.status === 'on') sounds.brickSound.play()
                     console.log('hit top')
             // detect bottom of bricks
             } else if(ball.x + ball.radius >= brick.x && 
@@ -481,8 +518,7 @@ function animateBricks() {
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)   
                     players[currentPlayer].score += 100
-                    brickSound.pause()
-                    brickSound.play()
+                    if(soundStats.status === 'on') sounds.brickSound.play()
                     console.log('hit bottom')
             // detect left side of bricks
             } else if (ball.x + ball.radius >= brick.x && 
@@ -493,8 +529,7 @@ function animateBricks() {
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
                     players[currentPlayer].score += 100
-                    brickSound.pause()
-                    brickSound.play()
+                    if(soundStats.status === 'on') sounds.brickSound.play()
                     console.log('hit left')
             // detect right side of bricks
             } else if (ball.x + ball.radius >= brick.x + brick.width * .99 && 
@@ -505,8 +540,7 @@ function animateBricks() {
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
                     players[currentPlayer].score += 100
-                    brickSound.pause()
-                    brickSound.play()
+                    if(soundStats.status === 'on') sounds.brickSound.play()
                     console.log('hit right')
             }
         })
@@ -523,13 +557,13 @@ function loseLife() {
     } else {
         // change life value to 0
         players[currentPlayer].lives[lifeIdx] = 0
+        if(soundStats.status === 'on') sounds.loseLifeSound.play()
     }
 
     // change players if in two player mode
     if(numOfPlayers == 2) currentPlayer *= -1
 }
 
-// check for winner
 function checkForWinner() {
     // check if each player's bricks are cleared
     for(let player in players) {
@@ -547,16 +581,21 @@ function checkForWinner() {
     }
 }
 
-// show game over modal
 function gameOver() {
+    // play game over sound
+    if(soundStats.status === 'on') sounds.gameOverSound.play()
+
+    // show game over modal
     gameOverModal.style.display = 'block'
 }
 
-// show winner modal
 function showWinner() {
     // update DOM with winner name
     const winnerEl = document.querySelector('#winner')
     winnerEl.innerText = `congrats ${players[winner].playerName}`
+
+    // play win sound
+    if(soundStats.status === 'on') sounds.winSound.play()
 
     // show winner modal
     winnerModal.style.display = 'block'
@@ -633,7 +672,6 @@ HTML canvas movement controls:
 
 sounds:
 https://pixabay.com/sound-effects/search/game/
-
-
+https://www.zapsplat.com/
 
 */
