@@ -1,16 +1,3 @@
-/* 
-PUZZLES TO SOLVE:
-- move ball
-    - fine tune movement directions?
-    - ball accelerated when spacebar is pushed again??
-- collision detection --> maybe use switch cases??? 
-    - collisions with side of paddle
-    - collisions with bricks 
-        - sides and bottom??
-- sound doesn't play for every brick hit --> need shorter sound clip??
-- improve responsive layout
-*/
-
 /*-----------------------------------------
 canvas element
 ------------------------------------------*/
@@ -24,8 +11,8 @@ canvasEl.height = canvasEl.width / 2
 /*-----------------------------------------
 variables
 ------------------------------------------*/
-let numOfPlayers = 1
-let currentPlayer = 1
+let numOfPlayers = '1'
+let currentPlayer = '1'
 
 const players = {
     1: {
@@ -435,40 +422,51 @@ function animateBricks() {
                     players[currentPlayer].score += 100
                     // play sound (if sound is on)
                     if(soundStats.status === 'on') sounds.brickSound.play()
-                    console.log('hit top')
+
                     // detect bottom of bricks
             } else if(ball.x + ball.radius >= brick.x && 
                 ball.x - ball.radius <= brick.x + brick.width &&
                 ball.y + ball.radius >= brick.y + brick.height * .99 &&
                 ball.y - ball.radius <= brick.y + brick.height) {
+                    // reverse ball y direction
                     ball.vy *= -1
+                    // clear brick and remove from array
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)   
+                    // increase score
                     players[currentPlayer].score += 100
+                    // play sound (if sound is on)
                     if(soundStats.status === 'on') sounds.brickSound.play()
-                    console.log('hit bottom')
+
                     // detect left side of bricks
             } else if (ball.x + ball.radius >= brick.x && 
                 ball.x - ball.radius <= brick.x + brick.width * .01 &&
                 ball.y + ball.radius >= brick.y &&
                 ball.y - ball.radius <= brick.y + brick.height) {
+                    // reverse ball x direction
                     ball.vx *= -1
+                    // clear brick and remove from array
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
+                    // increase score
                     players[currentPlayer].score += 100
+                    // play sound (if sound is on)
                     if(soundStats.status === 'on') sounds.brickSound.play()
-                    console.log('hit left')
+
                     // detect right side of bricks
             } else if (ball.x + ball.radius >= brick.x + brick.width * .99 && 
                 ball.x - ball.radius <= brick.x + brick.width &&
                 ball.y + ball.radius >= brick.y &&
                 ball.y - ball.radius <= brick.y + brick.height) {
+                    // reverse ball x direction
                     ball.vx *= -1
+                    // clear brick and remove from array
                     ctx.clearRect(brick.x, brick.y, brick.width, brick.height)
                     row.splice(j, 1)
+                    // increase score
                     players[currentPlayer].score += 100
+                    // play sound (if sound is on)
                     if(soundStats.status === 'on') sounds.brickSound.play()
-                    console.log('hit right')
             }
         })
     })
