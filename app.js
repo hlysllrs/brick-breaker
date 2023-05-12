@@ -8,9 +8,6 @@ PUZZLES TO SOLVE:
     - collisions with bricks 
         - sides and bottom??
 - sound doesn't play for every brick hit --> need shorter sound clip??
-- center paddle for each difficulty
-- game over
-    - implement for 2 players
 - wins
     - implement for 2 players (currently whoever loses first)
 - tie if both players clear all bricks???
@@ -111,7 +108,7 @@ const brickLayout = {
 
 const soundStats = {
     status: 'on',
-    volumeLevel: 0.1
+    volumeLevel: 0.5
 }
 
 const sounds = {
@@ -119,18 +116,9 @@ const sounds = {
     hitSound: new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3'), 
     gameOverSound: new Audio ('sounds/game-over-arcade-6435.mp3'), 
     winSound: new Audio('sounds/esm_8_bit_small_win_arcade_80s_simple_alert_notification_game.mp3'), 
-    loseLifeSound: new Audio('sounds/blip-131856.mp3')
+    loseLifeSound: new Audio('sounds/blip-131856.mp3'),
+    switchPlayerSound: new Audio('sounds/zapsplat_multimedia_game_sound_switch_plastic_click_002_79561.mp3')
 }
-// const brickSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_008_17644.mp3')
-// brickSound.volume = sound.volumeLevel
-// const hitSound = new Audio('sounds/zapsplat_multimedia_game_blip_generic_tone_006_17642.mp3')
-// hitSound.volume = sound.volumeLevel
-// const gameOverSound = new Audio ('sounds/game-over-arcade-6435.mp3')
-// gameOverSound.volume = sound.volumeLevel
-// const winSound = new Audio('sounds/esm_8_bit_small_win_arcade_80s_simple_alert_notification_game.mp3')
-// winSound.volume = sound.volumeLevel
-// const loseLifeSound = new Audio('sounds/blip-131856.mp3')
-// loseLifeSound.volume = sound.volumeLevel
 
 /*-----------------------------------------
 cached DOM elements
@@ -213,6 +201,12 @@ soundBtnCont.addEventListener('click', (e) => {
     const val = e.target.id.replace(/sound-/, '')
     soundStats.status = val
 
+    // if sound if off, set volume slider to 0
+    if(val === 'off') volSlider.value = 0
+    // if sound is on, set volume slider to volume level
+    if(val === 'on') volSlider.value = soundStats.volumeLevel * 100
+    
+
     // update selections in options menu
     setMenuSelections()
 })
@@ -246,7 +240,6 @@ function init() {
     setCanvasSize()
     addBricksToArr()
     setDifficulty()
-    setVolume()
     displayCurrentPlayer()
     drawBricks()
     drawBall()
@@ -551,17 +544,33 @@ function loseLife() {
     // check for first 1 (usable life) in lives array
     const lifeIdx = players[currentPlayer].lives.indexOf(1)
 
-    // if no usable lives present, game over
-    if(lifeIdx === -1) {
-        gameOver()
-    } else {
-        // change life value to 0
-        players[currentPlayer].lives[lifeIdx] = 0
-        if(soundStats.status === 'on') sounds.loseLifeSound.play()
-    }
-
-    // change players if in two player mode
-    if(numOfPlayers == 2) currentPlayer *= -1
+    switch (numOfPlayers) {
+        // one player mode
+        case '1':
+            // if no usable lives present, game over
+            if(lifeIdx === -1) {
+                gameOver()
+            } else {
+                // change life value to 0
+                players[currentPlayer].lives[lifeIdx] = 0
+                if(soundStats.status === 'on') sounds.loseLifeSound.play()
+            }
+            break
+        // two player mode
+        case '2':
+            // if player 2 has no useable lives present, game over
+            if(players[currentPlayer].playerName === 'player two' && lifeIdx === -1) {
+                gameOver()
+            } else {
+                // change life value to 0
+                players[currentPlayer].lives[lifeIdx] = 0
+                if(soundStats.status === 'on') sounds.loseLifeSound.play()
+                // switch players
+                currentPlayer *= -1
+                if(soundStats.status === 'on') sounds.switchPlayerSound.play()
+            }
+            break
+    } 
 }
 
 function checkForWinner() {
