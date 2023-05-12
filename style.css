@@ -195,12 +195,6 @@ button {
     font-size: 100%;
 }
 
-.opt-button:hover {
-    color: #f4f4f4;
-    background-color: #000000;
-    cursor: pointer;
-}
-
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
