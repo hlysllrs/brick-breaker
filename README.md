@@ -3,6 +3,69 @@
 **a brick breaker game™** is my take on Atari's classic arcade game, Breakout. 
 The goal of the game is to destroy all the bricks on the screen by using the paddle to bounce the ball toward them, without letting the ball fall below the paddle.
 
+### Pseudocode and Wireframe
+<details>
+<summary>Initial pseudocode and wireframe plan:</summary>
+
+**Project 1:** The DOM Game
+
+**Game:** A Brick Breaker Game
+
+**Wireframe:** 
+[Click here](https://www.figma.com/file/wU03s8ztf5Sp8DJRPqV9Ql/Project-1---Wireframe?type=design&node-id=0%3A1&t=uWgMZbwQknvcqzWX-1) to view the initial wireframe on Figma.
+
+**Pseudocode:** 
+state variables: 
+    set score to 0
+    set lives to 3
+    bricks
+    ball position
+    paddle position
+
+cached elements: 
+    cache score from html
+    cache lives from html
+    cache paddle element from html
+    cache ball element from html
+    cache brick elements from html
+    cache game container from html
+
+event listeners: 
+    spacebar --> launch ball
+    left arrow --> move paddle to the left
+    right arrow --> move paddle to the right
+
+
+functions: 
+    initialize
+        initialize dom elements in browser
+
+    collision detection
+        if ball collides with paddle or side or top wall 
+            bounce ball in opposite direction at same angle 
+            render state to dom
+        else if ball collides with brick, 
+            bounce ball in opposite direction at same angle
+            remove brick
+            increment score
+            render state to dom
+
+    missed ball
+        if ball falls past paddle, 
+            decrement lives
+            reset ball on paddle
+            render state to dom
+
+things to figure out: 
+    use html canvas api or divs
+    ball movement
+    collision detection
+    different brick colors require different number of hits to remove
+    include powerups
+    1 or 2 players
+    difficulty options
+
+</details>
 
 ## Screenshots:
 #### Game Start
