@@ -16,8 +16,7 @@ The goal of the game is to destroy all the bricks on the screen by using the pad
 [Click here](https://www.figma.com/file/wU03s8ztf5Sp8DJRPqV9Ql/Project-1---Wireframe?type=design&node-id=0%3A1&t=uWgMZbwQknvcqzWX-1) to view the initial wireframe on Figma.
 
 **Pseudocode:** 
-
-'''
+```
 state variables: 
     set score to 0
     set lives to 3
@@ -67,7 +66,7 @@ things to figure out:
     include powerups
     1 or 2 players
     difficulty options
-'''
+```
 </details>
 
 ## Screenshots:
