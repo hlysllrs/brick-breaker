@@ -4,7 +4,7 @@
 The goal of the game is to destroy all the bricks on the screen by using the paddle to bounce the ball toward them, without letting the ball fall below the paddle.
 
 
-### Screenshots:
+## Screenshots:
 #### Game Start
 ![game intro modal](screenshots/screenshot-start-modal.png)
 
@@ -14,15 +14,15 @@ The goal of the game is to destroy all the bricks on the screen by using the pad
 #### Game Options Menu
 ![game options menu](screenshots/screenshot-options-menu.png)
 
-#### Loss Modal
-![lose game modal](screenshots/screenshot-loss.png)
+### Result Modal
+![result game modal](screenshots/screenshot-loss.png)
 
 
-### Technologies Used:
+## Technologies Used:
 JavaScript, HTML, CSS
 
 
-### Getting Started:
+## Getting Started:
 [Click here](https://hlysllrs.github.io/unit-1-project/) to play the game.
 
 Use the spacebar to launch the ball, and use the arrow keys to move the paddle.
@@ -30,7 +30,7 @@ You will have 4 chances to clear all of the bricks.
 Difficulty, number of players, and sound settings can be adjusted in the menu. 
 
 
-### Next Steps: 
+## Next Steps: 
 - implement the player's score in a more meaningful way, to it isn't always the same
 
 - improve collisions to recognize the sides of bricks and the paddle
