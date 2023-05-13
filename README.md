@@ -5,7 +5,17 @@ The goal of the game is to destroy all the bricks on the screen by using the pad
 
 
 ## Screenshots:
+#### Game Start
+![game intro modal](screenshots/screenshot-start-modal.png)
 
+#### Game Options Menu
+![game options menu](screenshots/screenshot-options-menu.png)
+
+#### Gameplay
+![gameplay](screenshots/screenshot-gameplay.png)
+
+#### Loss Modal
+![lose game modal](screenshots/screenshot-loss.png)
 
 
 ## Technologies Used:
