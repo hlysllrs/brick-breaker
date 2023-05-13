@@ -3,11 +3,11 @@
 **a brick breaker game™** is my take on Atari's classic arcade game, Breakout. 
 The goal of the game is to destroy all the bricks on the screen by using the paddle to bounce the ball toward them, without letting the ball fall below the paddle.
 
-### Pseudocode and Wireframe
+## Pseudocode and Wireframe
 
 <details>
 <summary>Initial pseudocode and wireframe plan:</summary>
-
+<br>
 **Project 1:** The DOM Game
 
 **Game:** A Brick Breaker Game
