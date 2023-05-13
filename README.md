@@ -8,6 +8,7 @@ The goal of the game is to destroy all the bricks on the screen by using the pad
 <details>
 <summary>Initial pseudocode and wireframe plan:</summary>
 <br>
+
 **Project 1:** The DOM Game
 
 **Game:** A Brick Breaker Game
