@@ -89,7 +89,7 @@ JavaScript, HTML, CSS
 
 
 ## Getting Started:
-[Click here](https://hlysllrs.github.io/unit-1-project/) to play the game.
+[Click here](https://hlysllrs.github.io/brick-breaker/) to play the game.
 
 Use the spacebar to launch the ball, and use the arrow keys to move the paddle.
 You will have 4 chances to clear all of the bricks. 
